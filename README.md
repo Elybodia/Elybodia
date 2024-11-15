@@ -1,7 +1,16 @@
 import requests
 
 # Ton token d'accès et ID du numéro WhatsApp Business
-ACCESS_TOKEN = "VOTRE_TOKEN_D'ACCÈS"
+ACCESS_TOKEN = {
+   "error": {
+      "message": "Invalid OAuth 2.0 Access Token",
+      "type": "WAApiException",
+      "code": 190,
+      "error_data": {
+         
+      },
+      "fbtrace_id": "A_XxC4h9zabODV22XqVheBt"
+   
 PHONE_NUMBER_ID = "VOTRE_PHONE_NUMBER_ID"  # Trouvé dans la configuration de l'API
 WHATSAPP_API_URL = f"https://graph.whatsapp.com/v16.0/{PHONE_NUMBER_ID}/messages"
 
