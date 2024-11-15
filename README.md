@@ -1,4 +1,4 @@
-
+TTE DATABASE postgresql://thomas_nse0_user:DNcjvbg1wtgeAW8hPvxLwUIEYTOTgbZe@dpg-cse5hcjtq21c73850jvg-a.oregon-postgres.render.com/thomas_nse0
 on:
 
 push:
