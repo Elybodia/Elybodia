@@ -10,10 +10,10 @@ def envoyer_message(to, message):
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
         "Content-Type": "application/json"
-    }
+    }acces watsapp
     data = {
         "messaging_product": "whatsapp",
-        "to": to,
+        "to": to,bodiaely
         "type": "text",
         "text": {"body": message}
     }
@@ -25,6 +25,6 @@ def envoyer_message(to, message):
 
 # Exemple d'utilisation
 if __name__ == "__main__":
-    numero_test = "04245289"  # Inclure le code pays, ex : "33612345678" pour la France
+    numero_24104245289gabon
     message = "Salut ! C'est un bot WhatsApp."
     envoyer_message(numero_test, message)python whatsapp_bot.py
