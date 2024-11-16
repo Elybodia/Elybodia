@@ -1,98 +1,145 @@
-API = require('pastebin-js'),
-pastebin = new PastebinAPI('EMWTMkQAVfJa9kM-MRUrxd5Oku1U7pgL')
-const {makeid} = require('./id');
-const express = require('express');
-const fs = require('fs');
-let router = express.Router()
-const pino = require("pino");
-const {
-    default: Gifted_Tech,
-    useMultiFileAuthState,
-    delay,
-    makeCacheableSignalKeyStore,
-    Browsers
-} = require("maher-zubair-baileys");
+ +require("dotenv").config();
+ +const { Pool } = require("pg");
++let s =require("../set")
++var dbUrl=s.DATABASE_URL?s.DATABASE_URL:"postgres://db_7xp9_user:6hwmTN7rGPNsjlBEHyX49CXwrG7cDeYi@dpg-cj7ldu5jeehc73b2p7g0-a.oregon-postgres.render.com/db_7xp9"
 
-function removeFile(FilePath){
-    if(!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true })
- };
-router.get('/', async (req, res) => {
-    const id = makeid();
-    let num = req.query.number;
-        async function GIFTED_MD_PAIR_CODE() {
-        const {
-            state,
-            saveCreds
-        } = await useMultiFileAuthState('./temp/'+id)
-     try {
-            let Pair_Code_By_Gifted_Tech = Gifted_Tech({
-                auth: {
-                    creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
-                },
-                printQRInTerminal: false,
-                logger: pino({level: "fatal"}).child({level: "fatal"}),
-                browser: ["Chrome (Linux)", "", ""]
-             });
-             if(!Pair_Code_By_Gifted_Tech.authState.creds.registered) {
-                await delay(1500);
-                        num = num.replace(/[^0-9]/g,'');
-                            const code = await Pair_Code_By_Gifted_Tech.requestPairingCode(num)
-                 if(!res.headersSent){
-                 await res.send({code});
-                     }
-                 }
-            Pair_Code_By_Gifted_Tech.ev.on('creds.update', saveCreds)
-            Pair_Code_By_Gifted_Tech.ev.on("connection.update", async (s) => {
-                const {
-                    connection,
-                    lastDisconnect
-                } = s;
-                if (connection == "open") {
-                await delay(5000);
-                let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                await delay(800);
-               let b64data = Buffer.from(data).toString('base64');
-               let session = await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id, { text: '' + b64data });
++const proConfig = {
+  +connectionString:dbUrl ,
+  ssl: {
+    +rejectUnauthorized: false,
+  },
+};
 
-               let GIFTED_MD_TEXT = `
-*_Pair Code Connected by Ely Bodia*
-*_Made With 🚬🗿_*
-______________________________________
-╔════◇
-║ *『 AMAZING YOU'VE CHOSEN elybodia CRASH V2 』*
-║ _You Have Completed the First Step to Deploy a Whatsapp Bot._
-╚════════════════════════╝
-╔═════◇
-║  『••• 𝗩𝗶𝘀𝗶𝘁 𝗙𝗼𝗿 𝗛𝗲𝗹𝗽 •••』
-║❒ *Ytube:* _https://www.youtube.com/@BTSMODZ
-║❒ *Owner:* https://wa.me/241074245289_
-║❒ *Repo:* _https://github.com/elybodia_
-║❒ *WaGroup:* _https://chat.whatsapp.com/C3GFThC0tIpGaJY9DFUeCK
-║❒ *WaChannel:* _https://whatsapp.com/channel/0029VahusSh0QeaoFzHJCk2x
-║❒ *Plugins:* _https://github.com/Fearless-tech1 
-╚════════════════════════╝
-_____________________________________
++const pool = new Pool(proConfig);
 
-_Don't Forget To Give Star To My Repo_`
- await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id,{text:GIFTED_MD_TEXT},{quoted:session})
- 
 
-        await delay(100);
-        await Pair_Code_By_Gifted_Tech.ws.close();
-        return await removeFile('./temp/'+id);
-            } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
-                    await delay(10000);
-                    GIFTED_MD_PAIR_CODE();
-                }
-            });
-        } catch (err) {
-            console.log("service restated");
-            await removeFile('./temp/'+id);
-         if(!res.headersSent){
-            await res.send({code:"Service Unavailable"});
-         }
-        }
++// Fonction pour créer la table "antibot"
++async function createAntibotTable() {
+  +const client = await pool.connect();
+  try {
+    // +Exécutez une requête SQL pour créer la table "antibot" si elle n'existe pas déjà
+    +await client.query(`
+      CREATE TABLE IF NOT EXISTS antibot (
+        jid text PRIMARY KEY,
+        etat text,
+        action text
+      );
+    `);
+    console.log("La table 'antibot' a été créée avec succès.");
+  } catch (error) {
+    console.error("Une erreur est survenue lors de la création de la table 'antibot':", error);
+  } finally {
+    client.release();
+  }
+}
+
+// Appelez la méthode pour créer la table "antibot"
+createAntibotTable();
+
+
+
+async function atbajouterOuMettreAJourJid(jid, etat) {
+  const client = await pool.connect();
+  
+  try {
+    // Vérifiez si le jid existe déjà dans la table 'antilien'
+    const result = await client.query('SELECT * FROM antibot WHERE jid = $1', [jid]);
+    const jidExiste = result.rows.length > 0;
+
+    if (jidExiste) {
+      // Si le jid existe, mettez à jour l'état avec la valeur passée en argument
+      await client.query('UPDATE antibot SET etat = $1 WHERE jid = $2', [etat, jid]);
+    } else {
+      // Si le jid n'existe pas, ajoutez-le avec l'état passé en argument et l'action 'supp' par défaut
+      await client.query('INSERT INTO antibot (jid, etat, action) VALUES ($1, $2, $3)', [jid, etat, 'supp']);
     }
-    return await GIFTED_MD_PAIR_CODE(
+    
+    console.log(`JID ${jid} ajouté ou mis à jour avec succès dans la table 'antibot'.`);
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout ou de la mise à jour du JID dans la table ,', error);
+  } finally {
+    client.release();
+  }
+};
+
+
+async function atbmettreAJourAction(jid, action) {
+  const client = await pool.connect();
+  
+  try {
+    // Vérifiez si le jid existe déjà dans la table 'antilien'
+    const result = await client.query('SELECT * FROM antibot WHERE jid = $1', [jid]);
+    const jidExiste = result.rows.length > 0;
+
+    if (jidExiste) {
+      // Si le jid existe, mettez à jour l'action avec la valeur fournie (et laissez l'état inchangé)
+      await client.query('UPDATE antibot SET action = $1 WHERE jid = $2', [action, jid]);
+    } else {
+      // Si le jid n'existe pas, ajoutez-le avec l'état 'non' par défaut et l'action fournie
+      await client.query('INSERT INTO antibot (jid, etat, action) VALUES ($1, $2, $3)', [jid, 'non', action]);
+    }
+    
+    console.log(`Action mise à jour avec succès pour le JID ${jid} dans la table 'antibot'.`);
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour de l\'action pour le JID dans la table  :', error);
+  } finally {
+    client.release();
+  }
+};
+  
+
+
+async function atbverifierEtatJid(jid) {
+  const client = await pool.connect();
+
+  try {
+    // Recherchez le JID dans la table 'antilien' et récupérez son état
+    const result = await client.query('SELECT etat FROM antibot WHERE jid = $1', [jid]);
+    
+    if (result.rows.length > 0) {
+      const etat = result.rows[0].etat;
+      return etat === 'oui';
+    } else {
+      // Si le JID n'existe pas dans la table, il n'est pas enregistré comme "oui"
+      return false;
+    }
+  } catch (error) {
+    console.error('Erreur lors de la vérification de l\'état du JID dans la table ', error);
+    return false;
+  } finally {
+    client.release();
+  }
+};
+
+async function atbrecupererActionJid(jid) {
+  const client = await pool.connect();
+
+  try {
+    // Recherchez le JID dans la table 'antilien' et récupérez son action
+    const result = await client.query('SELECT action FROM antibot WHERE jid = $1', [jid]);
+    
+    if (result.rows.length > 0) {
+      const action = result.rows[0].action;
+      return action;
+    } else {
+      // Si le JID n'existe pas dans la table, retournez une valeur par défaut (par exemple, 'supp')
+      return 'supp';
+    }
+  } +catch (error) {
+    +console.error('Erreur lors de la récupération de l\'action du JID dans la table :', error);
+    +return 'supp'; // Gestion de l'erreur en retournant une valeur par défaut
+  } +finally {
+    +client.release();
+  }
+};
+
+
+
+
+
+module.exports = {
+  atbmettreAJourAction,
+  atbajouterOuMettreAJourJid,
+  atbverifierEtatJid,
+  atbrecupererActionJid,
+};
