@@ -19,7 +19,7 @@
   try {
     // +Exécutez une requête SQL pour créer la table "antibot" si elle n'existe pas déjà
     +await client.query(`
-      CREATE TABLE IF NOT EXISTS antibot (
+      +CREATE TABLE IF NOT EXISTS antibot (
         jid text PRIMARY KEY,
         etat text,
         action text
